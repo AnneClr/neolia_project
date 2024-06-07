@@ -36,7 +36,7 @@ final class Request {
      * Request datas
      *  - POST, GET, JSON payload
      */
-    private array $datas;
+    private array $datas = [];
 
     public function __construct(Kernel $kernel) {
         $this->kernel = $kernel;
