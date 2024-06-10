@@ -62,7 +62,7 @@ export class HttpClient {
         
         this.body = JSON.stringify(body)
 
-        this.fetchOptions = {
+        this.#_fetchOptions = {
             method: 'put',
             mode: 'cors',
             headers: {
