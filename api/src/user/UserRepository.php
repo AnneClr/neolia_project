@@ -2,7 +2,6 @@
 /**
  * UserRepository
  *  Simple repository to manage User entity
- * @author Aélion <jean-luc.aubert@aelion.fr>
  * @version 1.0.0
  *  - findByLogin implementation
  */
@@ -21,6 +20,15 @@ class UserRepository {
     }
 
     public function findByLoginAndPassword(string $username, string $password): ?UserEntity {
+        // Clean inputs
+        $username = trim(htmlspecialchars($username, ENT_QUOTES, 'UTF-8'));
+        $password = trim(htmlspecialchars($password, ENT_QUOTES, 'UTF-8'));
+
+        // clean multiple spaces
+
+        $username = preg_replace('/\s+/', ' ', $username);
+        $username = str_replace(' ', '', $username);
+
         $sqlQuery = "SELECT 
             u.id userid, u.login login, u.password password, r.id roleid, r.role role, 
             a.id accountid, a.lastname lastname, a.firstname firstname, a.gender gender 
@@ -29,9 +37,12 @@ class UserRepository {
             JOIN user_has_role uhr ON u.id = uhr.user_id 
             JOIN role r ON uhr.role_id = r.id
             JOIN account a ON u.id = a.user_id 
-            WHERE login = '$username' AND password = '$password';";
+            WHERE login = :username AND password = :password;";
         
-        $pdoStatement = $this->dbInstance->query($sqlQuery);
+        $pdoStatement = $this->dbInstance->prepare($sqlQuery);
+        $pdoStatement->bindParam(':username', $username, \PDO::PARAM_STR);
+        $pdoStatement->bindParam(':password', $password, \PDO::PARAM_STR);
+        $pdoStatement->execute();
 
         if ($pdoStatement) {
             $result = $pdoStatement->fetch(\PDO::FETCH_OBJ);
@@ -61,11 +72,10 @@ class UserRepository {
                 }
                 return $user;
             } else {
-                throw new NotFoundException('No user were found with this credentials, using password');
+                throw new NotFoundException('No user were found with these credentials.');
             }
         } else {
-            throw new IncorrectSqlExpressionException('Something went wrong while processing query : ' . $sqlQuery);
+            throw new IncorrectSqlExpressionException('Something went wrong while processing query: ' . $sqlQuery);
         }
-        
     }
 }
