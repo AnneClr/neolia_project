@@ -14,7 +14,8 @@ use Api\Account\AccountEntity;
 
 class UserRepository {
     private \PDO $dbInstance;
-
+  
+    
     public function __construct() {
         $this->dbInstance = DBAL::getConnection();
     }
