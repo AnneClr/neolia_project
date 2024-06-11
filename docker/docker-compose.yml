@@ -20,6 +20,7 @@ services:
             - ./../api:/var/www/vhosts/api/htdocs
             - ./etc/apache2/api/sites-enabled:/etc/apache2/sites-enabled
             - ./logs:/var/log/apache2
+        #command: "sleep 60 & php /var/www/vhosts/api/htdocs/src/user/hash_password.php"
         ports: 
             - 8003:80
         networks: 
