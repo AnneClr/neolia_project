@@ -86,17 +86,21 @@ final class Request {
 
     }
 
+    // ... autres parties de la classe Request ...
+    
     private function setRequestDatas(): void {
         $postData = new PostData($this);
         $postData->process();
-
+    
         $getData = new GetData($this);
         $getData->process();
-
+    
         $payloadData = new PayloadData($this);
         $payloadData->process();
     }
-
+    
+    // ... autres parties de la classe Request ...
+    
     private function setCorsHeaders() {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: Origin, Content-Type');

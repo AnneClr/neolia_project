@@ -18,13 +18,15 @@ final class GetData implements ProcessData {
     }
 
     public function process(): void {
-        // Gather GET datas
-        if (!is_null($_GET)) {
-            foreach($_GET as $key => $value) {
-                $this->request->set($key, $value);
-            }
-            $_GET = null;
+        foreach ($_GET as $key => $value) {
+            // Sanitize the input data
+            $sanitizedValue = $this->sanitize($value);
+            $this->request->set($key, $sanitizedValue);
         }
+    }
 
+    private function sanitize($data) {
+        // Perform sanitization
+        return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
     }
 }

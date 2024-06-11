@@ -18,12 +18,25 @@ final class PayloadData implements ProcessData {
     }
 
     public function process(): void {
-        $rawJson = file_get_contents('php://input');
-        if (strlen($rawJson)) {
-            $data = json_decode($rawJson, true);
-            foreach($data as $key => $value) {
-                $this->request->set($key, $value);
+        $payload = json_decode(file_get_contents('php://input'), true);
+        if (is_array($payload)) {
+            foreach ($payload as $key => $value) {
+                // Sanitize the input data
+                $sanitizedValue = $this->sanitize($value);
+                $this->request->set($key, $sanitizedValue);
             }
+        }
+    }
+
+    private function sanitize($data) {
+        // Perform sanitization
+        if (is_array($data)) {
+            foreach ($data as $key => $value) {
+                $data[$key] = $this->sanitize($value);
+            }
+            return $data;
+        } else {
+            return htmlspecialchars(trim($data), ENT_QUOTES, 'UTF-8');
         }
     }
 }
