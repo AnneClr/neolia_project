@@ -1,0 +1,1 @@
+{"version":1,"defects":{"PostDataTest::testProcessSanitizesInput":8,"Aelion\\Http\\Request\\Datas\\Test\\PostDataTest\\PostDataTest::testProcessSanitizesInput":8},"times":{"PostDataTest::testProcessSanitizesInput":0.015,"Aelion\\Http\\Request\\Datas\\Test\\PostDataTest\\PostDataTest::testProcessSanitizesInput":0.016}}
