@@ -1,16 +1,68 @@
 <?php
-/**
- * UserRepository
- *  Simple repository to manage User entity
- * @version 1.0.0
- *  - findByLogin implementation
- */
 namespace Api\User;
 
 use Aelion\Dbal\DBAL;
 use Aelion\Dbal\Exception\NotFoundException;
 use Aelion\Dbal\Exception\IncorrectSqlExpressionException;
 use Api\Account\AccountEntity;
+
+/**
+ * UserRepository
+ *  Simple repository to manage User entity
+ * @version 1.0.0
+ *  - findByLogin implementation
+ */
+
+// Vérification du domaine autorisé
+$allowedDomains = ['http://localhost:5173']; // Liste des domaines autorisés
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if (!in_array($origin, $allowedDomains)) {
+    http_response_code(403); // Accès interdit
+    echo"nom de domaine non autorisé $origin";
+    exit;
+}
+
+// Vérification de l'agent utilisateur autorisé
+$allowedUserAgents = ['Edge', 'Chrome', 'Firefox', 'Safari']; // Liste des agents autorisés
+$userAgent = $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+$isValidUserAgent = false;
+foreach ($allowedUserAgents as $agent) {
+    if (stripos($userAgent, $agent) !== false) {
+        $isValidUserAgent = true;
+        break;
+    }
+}
+
+if (!$isValidUserAgent) {
+    http_response_code(403);
+    echo "navigateur non !!!!!" ;// Accès interdit
+    exit;
+}
+
+// Vérification de l'adresse IP autorisée
+$allowedIPs = ['172.18.0.1']; // Liste des adresses IP autorisées
+$clientIP = $_SERVER['REMOTE_ADDR'] ?? '';
+
+if (in_array($clientIP, $blacklistIPs)) {
+    http_response_code(403);
+    echo "adresse IP non autorisée (black liste) "; // Accès interdit
+    exit;
+}
+
+if (!in_array($clientIP, $allowedIPs)) {
+    http_response_code(403); // Accès interdit
+    echo "adresse IP non autorisée (white liste $clientIP)";
+    exit;
+}
+
+// Accès autorisé, continuer avec le traitement de la demande
+
+
+
+
+
 
 class UserRepository {
     private \PDO $dbInstance;
