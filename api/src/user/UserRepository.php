@@ -45,11 +45,6 @@ if (!$isValidUserAgent) {
 $allowedIPs = ['172.18.0.1']; // Liste des adresses IP autorisées
 $clientIP = $_SERVER['REMOTE_ADDR'] ?? '';
 
-if (in_array($clientIP, $blacklistIPs)) {
-    http_response_code(403);
-    echo "adresse IP non autorisée (black liste) "; // Accès interdit
-    exit;
-}
 
 if (!in_array($clientIP, $allowedIPs)) {
     http_response_code(403); // Accès interdit
