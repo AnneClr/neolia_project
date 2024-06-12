@@ -11,8 +11,10 @@
 
 namespace Aelion\Router;
 
-use Aelion\Http\Response;
 use Api\User\UserRepository;
+use Aelion\Http\Response\JsonResponse;
+use Aelion\Dbal\Exception\NotFoundException;
+use Aelion\Dbal\Exception\IncorrectSqlExpressionException;
 
 class Router extends \AltoRouter
 {
@@ -28,7 +30,7 @@ class Router extends \AltoRouter
             'GET',
             '/',
             function () {
-                Response::sendJson(200, ['message' => 'Welcome to the API']);
+                JsonResponse::sendJson(200, ['message' => 'Welcome to the API']);
             }
         );
 
@@ -49,14 +51,14 @@ class Router extends \AltoRouter
                         $jwt = generateJWT($user);
 
                         // Envoyer le JWT en tant que réponse
-                        Response::sendJson(200, array("jwt" => $jwt));
+                        JsonResponse::sendJson(200, array("jwt" => $jwt));
                     } catch (NotFoundException $e) {
-                        Response::sendJson(401, array("message" => "Invalid username or password"));
+                        JsonResponse::sendJson(401, array("message" => "Invalid username or password"));
                     } catch (IncorrectSqlExpressionException $e) {
-                        Response::sendJson(500, array("message" => "Internal server error"));
+                        JsonResponse::sendJson(500, array("message" => "Internal server error"));
                     }
                 } else {
-                    Response::sendJson(400, array("message" => "Username and password are required"));
+                    JsonResponse::sendJson(400, array("message" => "Username and password are required"));
                 }
             }
         );
