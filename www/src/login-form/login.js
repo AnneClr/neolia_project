@@ -77,9 +77,9 @@ export class Login {
         if (!errorElement) {
             errorElement = document.createElement('div')
             errorElement.className = 'backend-error-message'
+            errorElement.style.color = 'red'
             document.querySelector('form').insertBefore(errorElement, document.querySelector('form').firstChild)
-            console.log(errorElement);
         }
-        errorElement.textContent = message
+        errorElement.textContent = "Les informations saisies ne sont pas correctes."
     }
 }

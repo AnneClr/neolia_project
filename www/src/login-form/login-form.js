@@ -13,8 +13,6 @@ export class LoginForm extends Form {
     constructor(formSelector) {
         super()
         this.#formSelector = formSelector
-
-        //this.form = this.#loadForm(formSelector)
     }
 
     #setFields() {
@@ -37,7 +35,7 @@ export class LoginForm extends Form {
 
         const form = document.querySelector('form')
 
-        form.querySelectorAll('[data-rel]').forEach((el, key) => {
+        form.querySelectorAll('[data-rel]').forEach((el) => {
             this.formFields.push(el)
         })
 
@@ -53,7 +51,9 @@ export class LoginForm extends Form {
     validateField(field) {
         const controlName = field.getAttribute('data-rel')
         const control = this.getControl(controlName)
-        const error = control.validate()
+        control.value = field.value
+
+        const error = control.value === '' ? 'Ce champ ne peut être vide.' : null
 
         if (error) {
             this.showError(field, error)
@@ -67,9 +67,10 @@ export class LoginForm extends Form {
         if (!errorElement || !errorElement.classList.contains('error-message')) {
             errorElement = document.createElement('div')
             errorElement.className = 'error-message'
+            errorElement.style.color = 'rgb(225, 100, 10)'
             field.parentNode.insertBefore(errorElement, field.nextSibling)
         }
-        errorElement.textContent = message
+        errorElement.textContent = message || "Erreur inconnue"
     }
 
     clearError(field) {
