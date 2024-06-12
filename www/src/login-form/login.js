@@ -8,10 +8,10 @@ import { take } from 'rxjs'
 
 export class Login {
 
-   /**
-    * @var TemplateLoader
-    * Template loader utility
-    */
+    /**
+     * @var TemplateLoader
+     * Template loader utility
+     */
     #loader
 
     /**
@@ -34,20 +34,24 @@ export class Login {
     constructor() {
         this.#service = new LoginService()
         this.init()
-        
     }
 
     async init() {
         this.#form = new LoginForm('login-form')
         await this.#form.loadForm()
         this.#clickHandler = new ClickEventHandler(this)
+        document.querySelector('form').addEventListener('submit', (event) => this.handleSubmit(event))
+    }
+
+    handleSubmit(event) {
+        event.preventDefault()
+        this.send()
     }
 
     /**
-     * Negociate login with backend
+     * Negotiate login with backend
      */
     send() {
-        
         const value = this.#form.value
         this.#service.signin(value)
             .pipe(
@@ -55,17 +59,27 @@ export class Login {
             )
             .subscribe({
                 next: (response) => {
-                    
+                    // Handle successful login
+                    console.log('Login successful', response)
                 },
                 error: (error) => {
-                    /**
-                     * Your logic here
-                     */
+                    console.log(error);
+                    this.showBackendError(error.message)
                 },
                 complete: () => {
                     this.#form.unsubscribe()
-                    //document.querySelector('form').remove()
                 }
             })
+    }
+
+    showBackendError(message) {
+        let errorElement = document.querySelector('.backend-error-message')
+        if (!errorElement) {
+            errorElement = document.createElement('div')
+            errorElement.className = 'backend-error-message'
+            document.querySelector('form').insertBefore(errorElement, document.querySelector('form').firstChild)
+            console.log(errorElement);
+        }
+        errorElement.textContent = message
     }
 }

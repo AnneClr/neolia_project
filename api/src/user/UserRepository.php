@@ -56,7 +56,8 @@ if (!in_array($clientIP, $allowedIPs)) {
 
 class UserRepository {
     private \PDO $dbInstance;
-
+  
+    
     public function __construct() {
         $this->dbInstance = DBAL::getConnection();
     }
