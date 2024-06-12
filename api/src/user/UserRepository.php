@@ -54,10 +54,23 @@ if (!in_array($clientIP, $allowedIPs)) {
 
 // Accès autorisé, continuer avec le traitement de la demande
 
+<?php
+/**
+ * UserRepository
+ *  Simple repository to manage User entity
+ * @version 1.0.0
+ *  - findByLogin implementation
+ */
+namespace Api\User;
+
+use Aelion\Dbal\DBAL;
+use Aelion\Dbal\Exception\NotFoundException;
+use Aelion\Dbal\Exception\IncorrectSqlExpressionException;
+use Api\Account\AccountEntity;
+
 class UserRepository {
     private \PDO $dbInstance;
-  
-    
+
     public function __construct() {
         $this->dbInstance = DBAL::getConnection();
     }
@@ -128,3 +141,5 @@ class UserRepository {
         }
     }
 }
+
+
