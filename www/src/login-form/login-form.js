@@ -62,14 +62,15 @@ export class LoginForm extends Form {
         }
     }
 
-    showError(field, message) {
+    showError(field) {
         let errorElement = field.nextElementSibling
         if (!errorElement || !errorElement.classList.contains('error-message')) {
             errorElement = document.createElement('div')
             errorElement.className = 'error-message'
+            errorElement.style.color = 'rgb(225, 100, 10)'
             field.parentNode.insertBefore(errorElement, field.nextSibling)
         }
-        errorElement.textContent = message
+        errorElement.textContent = "Ce champ ne peut être vide."
     }
 
     clearError(field) {
