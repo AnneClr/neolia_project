@@ -1,5 +1,5 @@
 export class HTMLComponent {
-    #_parent! = null
+    #_parent = null
     #_componentType = ''
     #_content = ''
     #_args = []
@@ -21,12 +21,24 @@ export class HTMLComponent {
         this.#_content = content;
     }
 
+    get content() {
+        return this.#_content
+    }
+    
     set componentType(type) {
         this.#_componentType = type;
     }
 
+    get componentType() {
+        return this.#_componentType
+    }
+
     set args(attributes) {
         this.#_args.push(attributes)
+    }
+
+    get args() {
+        return this.#_args
     }
 
     addComponent(component) {}

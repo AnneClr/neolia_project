@@ -14,9 +14,9 @@ export class HtmlCompose extends HTMLComponent {
     }
 
     build() {
-        const el = document.createElement(this._componentType)
-        if (this._args && this._args.length > 0) {
-            const attributes = this._args[1]
+        const el = document.createElement(this.componentType)
+        if (this.args && this.args.length > 0) {
+            const attributes = this.args[1]
             for (const attribute in attributes) {
                 if (attribute === 'classes') {
                     attributes[attribute].forEach((cssClass) => {
@@ -37,8 +37,8 @@ export class HtmlCompose extends HTMLComponent {
             }
         }
 
-        if (this._content && this._content.toString().trim().length) {
-            el.textContent = this._content
+        if (this.content && this.content.toString().trim().length) {
+            el.textContent = this.content
         }
         if (this.children.length) {
             for (const child of this.children) {
