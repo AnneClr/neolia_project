@@ -13,7 +13,7 @@ if ($conn->connect_error) {
 }
 
 // Récupérer tous les utilisateurs
-$sqlQuery = "SELECT id, password FROM user";
+$sqlQuery = "SELECT id, password FROM user WHERE password NOT LIKE '$2y$%'";
 $result = $conn->query($sqlQuery);
 
 while ($user = $result->fetch_assoc()) {

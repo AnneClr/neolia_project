@@ -54,11 +54,6 @@ if (!in_array($clientIP, $allowedIPs)) {
 
 // Accès autorisé, continuer avec le traitement de la demande
 
-
-
-
-
-
 class UserRepository {
     private \PDO $dbInstance;
   
