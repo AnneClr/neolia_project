@@ -1,5 +1,6 @@
 import { BehaviorSubject, fromEvent } from 'rxjs'
-
+import { HtmlCompose } from './../../html-composer/html-compose'
+import { Control } from './../../forms/control'
 export class Handler {
     /**
      * Subscriptions array
@@ -94,7 +95,9 @@ export class Handler {
 
                         composer.content = Handler._getErrorMessage(control)
 
-                        container.appendChild(composer.build())
+                        const errorDiv = composer.build()
+                        console.log(errorDiv)
+                        container.appendChild(errorDiv)
                     }
                 })
         )
