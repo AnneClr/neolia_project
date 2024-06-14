@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Http Request processing
  * @author Aélion <jean-luc.aubert@aelion.fr>
@@ -6,6 +7,7 @@
  *  - Simply gather Request information
  *  - Route to controller
  */
+
 namespace Aelion\Http\Request;
 
 use Aelion\Http\Request\Exception\NoSuchArgumentException;
@@ -19,7 +21,8 @@ use Aelion\Http\Response\Response;
 use Aelion\Router\TargetParser;
 use Aelion\Router\ParsedRoute;
 
-final class Request {
+final class Request
+{
     private Kernel $kernel;
 
     /**
@@ -38,26 +41,31 @@ final class Request {
      */
     private array $datas = [];
 
-    public function __construct(Kernel $kernel) {
+    public function __construct(Kernel $kernel)
+    {
         $this->kernel = $kernel;
     }
 
-    public function get($key, $value=null): string {
+    public function get($key, $value = null): string
+    {
         if (array_key_exists($key, $this->datas)) {
             return $this->datas[$key];
         }
         throw new NoSuchArgumentException('Data : ' . $key . ' does not exists in this Http Request');
     }
 
-    public function set(string $key, string $value): void {
+    public function set(string $key, string $value): void
+    {
         $this->datas[$key] = $value;
     }
 
-    public function getPayload(): array {
+    public function getPayload(): array
+    {
         return $this->datas;
     }
 
-    public function process(): Response {
+    public function process(): Response
+    {
         $this->setCorsHeaders();
 
         $this->method = $_SERVER['REQUEST_METHOD'];
@@ -82,11 +90,10 @@ final class Request {
         } else {
             throw new NoRouteMatchingException('No candidate for ' . $this->uri . ' was found.');
         }
-        
-
     }
 
-    private function setRequestDatas(): void {
+    private function setRequestDatas(): void
+    {
         $postData = new PostData($this);
         $postData->process();
 
@@ -97,7 +104,8 @@ final class Request {
         $payloadData->process();
     }
 
-    private function setCorsHeaders() {
+    private function setCorsHeaders()
+    {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: Origin, Content-Type');
     }
