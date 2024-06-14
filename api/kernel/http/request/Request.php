@@ -1,7 +1,6 @@
 <?php
 /**
  * Http Request processing
- * @author Aélion <jean-luc.aubert@aelion.fr>
  * @version 1.0.0
  *  - Simply gather Request information
  *  - Route to controller
@@ -37,9 +36,21 @@ final class Request {
      *  - POST, GET, JSON payload
      */
     private array $datas = [];
+    private array $server;
+    private array $post;
+    private array $get;
+    private array $cookie;
+    private array $files;
+    private array $request;
 
-    public function __construct(Kernel $kernel) {
+    public function __construct(Kernel $kernel, array $server, array $post, array $get, array $cookie, array $files, array $request) {
         $this->kernel = $kernel;
+        $this->server = $server;
+        $this->post = $post;
+        $this->get = $get;
+        $this->cookie = $cookie;
+        $this->files = $files;
+        $this->request = $request;
     }
 
     public function get($key, $value=null): string {
@@ -60,30 +71,38 @@ final class Request {
     public function process(): Response {
         $this->setCorsHeaders();
 
-        $this->method = $_SERVER['REQUEST_METHOD'];
-        $this->uri = $_SERVER['REQUEST_URI'];
+        $this->method = $this->server['REQUEST_METHOD'];
+        $this->uri = $this->server['REQUEST_URI'];
 
         $match = $this->kernel->getRouter()->match();
 
         if ($match !== false) {
             $this->setRequestDatas();
             $target = $match['target'];
-            $targetParser = new TargetParser($target);
-            $parsedRoute = $targetParser->parse();
-            if ($parsedRoute->checkPath()) {
-                require_once(__DIR__ . '/../../../' . $parsedRoute->getPath() . $parsedRoute->getController() . '.php');
-                $class = new \ReflectionClass($parsedRoute->fqClassName());
-                $controllerInstance = $class->newInstanceArgs([$this]);
-                $endpoint = $parsedRoute->getEndpoint();
-                return $controllerInstance->{$endpoint}();
+            
+            // Ensure the target is a string or process a Closure
+            if ($target instanceof \Closure) {
+                $target = $target(); // Call the Closure to get the string
+            }
+
+            if (is_string($target)) {
+                $targetParser = new TargetParser($target);
+                $parsedRoute = $targetParser->parse();
+                if ($parsedRoute->checkPath()) {
+                    require_once(__DIR__ . '/../../../' . $parsedRoute->getPath() . $parsedRoute->getController() . '.php');
+                    $class = new \ReflectionClass($parsedRoute->fqClassName());
+                    $controllerInstance = $class->newInstanceArgs([$this]);
+                    $endpoint = $parsedRoute->getEndpoint();
+                    return $controllerInstance->{$endpoint}();
+                } else {
+                    throw new NoSuchFileException('No controller file were found for : ' . $parsedRoute->getController() . '.php');
+                }
             } else {
-                throw new NoSuchFileException('No controller file were found for : ' . $parsedRoute->getController() . '.php');
+                throw new \InvalidArgumentException("Expected a string, got " . gettype($target));
             }
         } else {
             throw new NoRouteMatchingException('No candidate for ' . $this->uri . ' was found.');
         }
-        
-
     }
 
     private function setRequestDatas(): void {
@@ -100,5 +119,12 @@ final class Request {
     private function setCorsHeaders() {
         header('Access-Control-Allow-Origin: *');
         header('Access-Control-Allow-Headers: Origin, Content-Type');
+    }
+
+    private function getTarget() {
+        // Example method returning a Closure for demonstration
+        return function() {
+            return "Namespace\\Controller#endpoint";
+        };
     }
 }

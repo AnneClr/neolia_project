@@ -2,9 +2,8 @@
 /**
  * Kernel
  *  Base class running first
- * @author Aélion <jean-luc.aubert@aelion.fr>
  * @version 1.0.0
- *  - Instanciate router
+ *  - Instantiate router
  *  - Handle request
  *  - Return Response object
  */
@@ -17,7 +16,6 @@ use Aelion\Http\Response\JsonResponse;
 use Aelion\Http\Response\HttpResponseStatus;
 use Aelion\Router\Exception\NoRouteMatchingException;
 use Aelion\Router\Exception\NoSuchFileException;
-
 use Dotenv\Dotenv;
 
 class Kernel {
@@ -42,7 +40,7 @@ class Kernel {
 
     /**
      * Create a Kernel instance if not already exists
-     * @return Aelion\Kernel
+     * @return Kernel
      */
     public static function create(): Kernel {
         if (self::$instance === null) {
@@ -51,32 +49,62 @@ class Kernel {
         return self::$instance;
     }
 
+    /**
+     * Process incoming request and return Response object
+     * @return Response|null
+     */
     public function processRequest(): ?Response {
-        $this->request = new Request($this);
         try {
+            // Gather necessary request data
+            $server = $_SERVER;
+            $post = $_POST;
+            $get = $_GET;
+            $cookie = $_COOKIE;
+            $files = $_FILES;
+            $request = $_REQUEST;
+            
+            // Instantiate Request object with necessary arguments
+            $this->request = new Request(
+                $this,
+                $server,
+                $post,
+                $get,
+                $cookie,
+                $files,
+                $request
+            );
+
+            // Process the request and get the response
             $response = $this->request->process();
         } catch (NoRouteMatchingException $e) {
+            // Handle NoRouteMatchingException
             $payload = [
                 'message' => $e->getMessage()
             ];
-            $response = new JsonResponse();
-            $response->setStatus(HttpResponseStatus::NotFound);
-            $response->setPayLoad($payload);
-        } catch(NoSuchFileException $e) {
+            $response = new JsonResponse($payload, HttpResponseStatus::NotFound);
+        } catch (NoSuchFileException $e) {
+            // Handle NoSuchFileException
             $payload = [
                 'message' => $e->getMessage()
             ];
-            $response = new JsonResponse();
-            $response->setStatus(HttpResponseStatus::NotFound);
-            $response->setPayLoad($payload);            
+            $response = new JsonResponse(string $payload, HttpResponseStatus::NotFound);
         }
+
+        // Return the response object
         return $response;
     }
 
+    /**
+     * Get the Router instance
+     * @return Router
+     */
     public function getRouter(): Router {
         return $this->router;
     }
 
+    /**
+     * Set the Router instance
+     */
     private function setRouter() {
         $this->router = new Router();
     }

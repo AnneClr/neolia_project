@@ -2,9 +2,8 @@
 /**
  * SigninService
  *  - Simple authentication service
- * @author Aélion <jean-luc.aubert@aelion.fr>
  * @version 1.0.0
- *  - signin method that create a DTO to return complete user and account
+ *  - signin method that creates a DTO to return complete user and account
  */
 namespace Api\User;
 
@@ -17,8 +16,7 @@ use Aelion\Http\Response\JsonResponse;
 use Aelion\Registry\Registrable;
 
 class SigninService implements Registrable {
-
-    private $repository = null;
+    private UserRepository $repository;
     private Request $request;
 
     private function __construct(Request $request) {
@@ -36,14 +34,16 @@ class SigninService implements Registrable {
 
     public function signin(): Response {
         try {
-            $userEntity = $this->repository->findByLoginAndPassword($this->request->get('username'), $this->request->get('userpassword'));
+            $username = $this->request->getPostParam('username');
+            $password = $this->request->getPostParam('password');
+            $userEntity = $this->repository->findByLoginAndPassword($username, $password);
+
             $roles = [];
             foreach ($userEntity->getRoles() as $role) {
-                $userRole = [
+                $roles[] = [
                     'id' => $role->getId(),
                     'role' => $role->getRole()
                 ];
-                array_push($roles, $userRole);
             }
 
             $payload = [
@@ -58,26 +58,18 @@ class SigninService implements Registrable {
                 ],
                 'roles' => $roles
             ];
-            $response = new JsonResponse();
-            $response->setPayload($payload);
-            return $response;
+
+            return new JsonResponse($payload, HttpResponseStatus::OK);
         } catch (IncorrectSqlExpressionException $e) {
-            $response = new JsonResponse();
-            $response->setStatus(HttpResponseStatus::InternalServerError);
-            $content = [
+            $response = new JsonResponse([
                 'message' => $e->getMessage()
-            ];
-            $response->setPayload($content);
+            ], HttpResponseStatus::InternalServerError);
             return $response;
         } catch (NotFoundException $e) {
-            $response = new JsonResponse();
-            $response->setStatus(HttpResponseStatus::NotFound);
-            $content = [
+            $response = new JsonResponse([
                 'message' => $e->getMessage()
-            ];
-            $response->setPayload($content);
-            return $response;       
+            ], HttpResponseStatus::NotFound);
+            return $response;
         }
-       
     }
 }
