@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Router
  *  Map routes and load controller according to method and path
@@ -7,24 +8,59 @@
  *  - Extends AltoRouter
  *  - Maps Hello route
  */
+
 namespace Aelion\Router;
 
-class Router extends \AltoRouter {
-    public function __construct() {
+use Api\User\UserRepository;
+use Aelion\Http\Response\JsonResponse;
+use Aelion\Dbal\Exception\NotFoundException;
+use Aelion\Dbal\Exception\IncorrectSqlExpressionException;
+
+class Router extends \AltoRouter
+{
+    public function __construct()
+    {
         parent::__construct();
         $this->setMapping();
     }
 
-    private function setMapping(): void {
+    private function setMapping(): void
+    {
         $this->map(
             'GET',
             '/',
-            'Api\Home\Home#hello'
+            function () {
+                JsonResponse::sendJson(200, ['message' => 'Welcome to the API']);
+            }
         );
+
         $this->map(
             'POST',
             '/signin',
-            'Api\User\Signin#signin'
+            function () {
+                $requestData = json_decode(file_get_contents('php://input'), true);
+
+                if (isset($requestData['username']) && isset($requestData['password'])) {
+                    $userRepository = new UserRepository();
+
+                    try {
+                        // Authentifier l'utilisateur
+                        $user = $userRepository->findByLoginAndPassword($requestData['username'], $requestData['password']);
+
+                        // Générer le JWT (fonction à implémenter)
+                        $jwt = generateJWT($user);
+
+                        // Envoyer le JWT en tant que réponse
+                        JsonResponse::sendJson(200, array("jwt" => $jwt));
+                    } catch (NotFoundException $e) {
+                        JsonResponse::sendJson(401, array("message" => "Invalid username or password"));
+                    } catch (IncorrectSqlExpressionException $e) {
+                        JsonResponse::sendJson(500, array("message" => "Internal server error"));
+                    }
+                } else {
+                    JsonResponse::sendJson(400, array("message" => "Username and password are required"));
+                }
+            }
         );
     }
 }

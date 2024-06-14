@@ -2,9 +2,10 @@
 namespace Api\User;
 
 use Aelion\Dbal\DBAL;
+use Api\Account\AccountEntity;
+use Aelion\Http\Response\JsonResponse;
 use Aelion\Dbal\Exception\NotFoundException;
 use Aelion\Dbal\Exception\IncorrectSqlExpressionException;
-use Api\Account\AccountEntity;
 
 /**
  * UserRepository
@@ -122,6 +123,12 @@ class UserRepository {
                     $account->setFirstname($result->firstname);
                     $account->setGender($result->gender);
                     $user->setAccount($account);
+
+                        // Generate JWT
+                    $jwt = generateJWT($user);
+
+    // Return JWT to the user
+                    JsonResponse::sendJson(200, array("jwt" => $jwt));
 
                     while ($result = $pdoStatement->fetch(\PDO::FETCH_OBJ)) {
                         $role = new RoleEntity();

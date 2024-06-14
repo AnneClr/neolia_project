@@ -12,7 +12,8 @@
 	"require" : {
 		"php" : "^8.2",
 		"altorouter/altorouter" : "^2.0",
-		"vlucas/phpdotenv" : "^5.1"
+		"vlucas/phpdotenv" : "^5.1",
+		"firebase/php-jwt": "^6.10"
 	},
 	"license" : "ISC",
 	"authors" : [{
